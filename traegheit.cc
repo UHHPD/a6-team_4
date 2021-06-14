@@ -25,7 +25,8 @@ int main() {
     Vektor x = zm->punkt();
     // Abstand Punkt x und Gerade a + t*u
     // Vektor n = ...;//Normalenvektor x-a kreuz u
-    double r = 0; //|n|/|u|
+    Vektor n((x-a).kreuz(u));
+    double r = (n.betrag()/u.betrag()); //|n|/|u|
     // std::cout << x << " :" << r << std::endl;
     // addiere Beitrag des Massenpunktes zum Traegheitsmoment
     J += m * r * r;
