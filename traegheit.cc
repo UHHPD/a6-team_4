@@ -4,10 +4,23 @@
 #include <iostream>
 #include <memory>
 
+double traegheit(Koerper* k, Vektor a, Vektor u){
+  double J = 0;
+  double m = k->M / k->N;
+
+  std::cout << "Berechene fuer " << k -> name() << ": ";
+
+  for (int i = 0; i < k->N; ++i) {
+    Vektor x = k->punkt();
+    Vektor n = ((x-a).kreuz(u));
+    double r = (n.betrag()/u.betrag()); 
+    J += m * r * r;
+  }
+  return J;
+}
+
 int main() {
-  const int N = 10000;     // Anzahl Integrationspunkte
-  const double M = 1;      // Masse des Zylindermantels
-  const double ZM_R = 3.0; // Radius der Zylindermantels
+  const double ZM_R = 1.0; // Radius der Zylindermantels
   const double ZM_L = 1.0; // Laenge des Zylindermantels
 
   Vektor a; // Punkt auf der Rotationsachse
@@ -17,35 +30,10 @@ int main() {
   std::cout << "Richtung:";
   std::cin >> u;
 
-  std::unique_ptr<Zylindermantel> zm(new Zylindermantel(ZM_R, ZM_L));
-
-  double J = 0;     // Massentraegheitsmoment
-  double m = M / N; // Masse eines Massenpunktes
-  for (int i = 0; i < N; ++i) {
-    Vektor x = zm->punkt();
-    // Abstand Punkt x und Gerade a + t*u
-    // Vektor n = ...;//Normalenvektor x-a kreuz u
-    Vektor n((x-a).kreuz(u));
-    double r = (n.betrag()/u.betrag()); //|n|/|u|
-    // std::cout << x << " :" << r << std::endl;
-    // addiere Beitrag des Massenpunktes zum Traegheitsmoment
-    J += m * r * r;
-  }
-  std::cout << "Massentraegheitsmoment fuer einen Zylindermantel"
-            << " mit a = " << a << " und u = " << u << ": " << J << std::endl;
-  J = 0;
-  std::unique_ptr<Vollzylinder> vz(new Vollzylinder(ZM_R, ZM_L));
-  for (int i = 0; i < N; ++i) { 
-    Vektor x = vz->punkt();
-    // Abstand Punkt x und Gerade a + t*u
-    // Vektor n = ...;//Normalenvektor x-a kreuz u
-    Vektor n((x-a).kreuz(u));
-    double r = (n.betrag()/u.betrag()); //|n|/|u|
-    // std::cout << x << " :" << r << std::endl;
-    // addiere Beitrag des Massenpunktes zum Traegheitsmoment
-    J += m * r * r;
-  }
-   std::cout << "Massentraegheitsmoment fuer einen Vollzylinder"
-            << " mit a = " << a << " und u = " << u << ": " << J << std::endl;
+  std::unique_ptr <Koerper> k1(new Zylindermantel(ZM_R ,ZM_L));
+   std::cout << traegheit(k1.get(), a, u) << std::endl;
+  
+  std::unique_ptr <Koerper> k2(new Vollzylinder(ZM_R ,ZM_L));
+  std::cout << traegheit(k2.get(), a, u) << std::endl;
   return 0;
 }
